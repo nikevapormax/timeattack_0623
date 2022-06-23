@@ -11,20 +11,23 @@ class CategorySeriralizer(serializers.ModelSerializer):
         fields = ["name"]
         
 class ItemSerializer(serializers.ModelSerializer):
-    category = CategorySeriralizer(many=True, read_only=True)
+    category = serializers.SerializerMethodField()
+    
+    def get_category(self, obj):
+        return obj.category.name
+    
     class Meta:
         model = Item
-        fields = ["name", "category", "img_url"]
+        fields = ["name", "category", "image_url"]
         
 class OrderSerializer(serializers.ModelSerializer):
-    item = ItemSerializer(many=True)
     class Meta:
         model = Order
-        fields = ["delivery_address", "order", "item"]
+        fields = ["delivery_address", "order_date"]
         
 class ItemOrderSerializer(serializers.ModelSerializer):
-    order = OrderSerializer(many=True)
-    item = ItemSerializer(many=True)
+    order = OrderSerializer(read_only=True)
+    item = ItemSerializer(read_only=True)
     class Meta:
         model = ItemOrder
-        fields = ["order", "item", "item_count"]
+        fields = ["id", "order", "item", "item_count"]
